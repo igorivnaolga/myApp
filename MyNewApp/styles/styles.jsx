@@ -7,10 +7,10 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
   },
   image: {
-    flex: 1,
-    zIndex: -1,
+    position: absolute,
+    bottom: 0,
+    top: 0,
     width: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
+    height: '100%',
   },
 });
