@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "expo": "^52.0.25"
+    "expo": "^52.0.25",
+    "react-native-svg": "^15.11.1"
   }
 }
