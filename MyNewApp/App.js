@@ -1,17 +1,20 @@
-import { View, Text } from 'react-native';
-import { StatusBar } from 'react-native-web';
+import { Image, View, StatusBar } from 'react-native';
+import { styles } from './styles';
+import { RegistrationScreen } from './Screens/RegistrationScreen';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 export default function App() {
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}
-    >
-      <Text>Hello World</Text>
-      <StatusBar style="auto" />
-    </View>
+    <SafeAreaProvider>
+      <View style={styles.container}>
+        <Image
+          source={require('./images/PhotoBG.jpg')}
+          resizeMode="cover"
+          style={styles.image}
+        />
+        <StatusBar barStyle="dark-content" />
+        <RegistrationScreen />
+      </View>
+    </SafeAreaProvider>
   );
 }
