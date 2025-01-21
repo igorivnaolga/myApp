@@ -1,20 +1,15 @@
-import { Image, View, StatusBar } from 'react-native';
-import { styles } from './styles';
-import { RegistrationScreen } from './Screens/RegistrationScreen';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { useFonts } from 'expo-font';
+import { RegistrationScreen } from './src/Screens/RegistrationScreen';
 
 export default function App() {
-  return (
-    <SafeAreaProvider>
-      <View style={styles.container}>
-        <Image
-          source={require('./images/PhotoBG.jpg')}
-          resizeMode="cover"
-          style={styles.image}
-        />
-        <StatusBar barStyle="dark-content" />
-        <RegistrationScreen />
-      </View>
-    </SafeAreaProvider>
-  );
+  const [fontsLoaded] = useFonts({
+    'Roboto-Regular': require('./assets/fonts/Roboto-Regular.ttf'),
+    'Roboto-Medium': require('./assets/fonts/Roboto-Medium.ttf'),
+  });
+
+  if (!fontsLoaded) {
+    return null;
+  }
+
+  return <RegistrationScreen />;
 }
