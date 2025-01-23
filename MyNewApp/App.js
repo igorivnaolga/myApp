@@ -1,5 +1,6 @@
 import { useFonts } from 'expo-font';
 import { RegistrationScreen } from './src/Screens/RegistrationScreen';
+import { LoginScreen } from './src/Screens/LoginScreen';
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -11,5 +12,10 @@ export default function App() {
     return null;
   }
 
-  return <RegistrationScreen />;
+  return (
+    <>
+      {/* <RegistrationScreen /> */}
+      <LoginScreen />;
+    </>
+  );
 }

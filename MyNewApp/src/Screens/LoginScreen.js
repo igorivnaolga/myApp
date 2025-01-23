@@ -10,27 +10,19 @@ import {
   View,
 } from 'react-native';
 import { styles } from '../../styles/styles';
-import { CirclePlusSvg } from '../../icons/CirclePlusSvg';
 import { StyledButton } from '../Components/StyledButton';
 
-export const RegistrationScreen = () => {
-  const [login, setLogin] = useState('');
+export const LoginScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
-  const onPressRegistration = () => {
-    console.log(
-      `Registration with Login: ${login}\nEmail:${email}\nPassword:${password}`
-    );
-  };
-
   const onPressLogin = () => {
-    console.log('Login pressed');
+    console.log(`Log in with Email:${email}\nPassword:${password}`);
   };
 
-  const onPressChangeAvatar = () => {
-    console.log('Change avatar pressed');
+  const onPressRegistration = () => {
+    console.log('Registration pressed');
   };
 
   return (
@@ -45,25 +37,12 @@ export const RegistrationScreen = () => {
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             style={styles.container}
           >
-            <View style={styles.formContainer}>
-              <View style={styles.avatar}>
-                <StyledButton
-                  buttonStyles={styles.avatarButton}
-                  onPress={onPressChangeAvatar}
-                >
-                  <CirclePlusSvg />
-                </StyledButton>
-              </View>
-
-              <Text style={styles.title}>Реєстрація</Text>
+            <View
+              style={[styles.formContainer, styles.formContainerLoginScreen]}
+            >
+              <Text style={styles.title}>Увійти</Text>
 
               <View style={styles.formFields}>
-                <TextInput
-                  placeholder="Логін"
-                  style={styles.input}
-                  value={login}
-                  onChangeText={setLogin}
-                />
                 <TextInput
                   placeholder="Адреса електронної пошти"
                   style={styles.input}
@@ -91,18 +70,20 @@ export const RegistrationScreen = () => {
 
               <StyledButton
                 buttonStyles={styles.mainActionButton}
-                onPress={onPressRegistration}
+                onPress={onPressLogin}
               >
-                <Text style={styles.mainActionButtonText}>Зареєструватися</Text>
+                <Text style={styles.mainActionButtonText}>Увійти</Text>
               </StyledButton>
 
               <View style={styles.secondaryActionContainer}>
-                <Text style={styles.secondaryActionText}>Вже є акаунт? </Text>
+                <Text style={styles.secondaryActionText}>Немає акаунту? </Text>
                 <StyledButton
                   buttonStyles={styles.secondaryActionButton}
-                  onPress={onPressLogin}
+                  onPress={onPressRegistration}
                 >
-                  <Text style={styles.secondaryActionButtonText}>Увійти</Text>
+                  <Text style={styles.secondaryActionButtonText}>
+                    Зареєструватися
+                  </Text>
                 </StyledButton>
               </View>
             </View>

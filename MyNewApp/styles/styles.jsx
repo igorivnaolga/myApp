@@ -30,6 +30,9 @@ export const styles = StyleSheet.create({
     borderTopLeftRadius: 25,
     paddingHorizontal: 16,
   },
+  formContainerLoginScreen: {
+    paddingTop: 24,
+  },
 
   title: {
     marginBottom: 33,
@@ -90,10 +93,10 @@ export const styles = StyleSheet.create({
     fontWeight: '400',
   },
 
-  registerButton: {
+  mainActionButton: {
     marginBottom: 16,
   },
-  registerButtonText: {
+  mainActionButtonText: {
     color: colors.white,
     fontFamily: 'Roboto-Regular',
     fontSize: 16,
@@ -101,22 +104,22 @@ export const styles = StyleSheet.create({
     fontWeight: '400',
   },
 
-  loginContainer: {
+  secondaryActionContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
   },
-  loginButton: {
+  secondaryActionButton: {
     paddingVertical: 0,
     backgroundColor: 'transparent',
   },
-  loginText: {
+  secondaryActionText: {
     color: colors.blue,
     fontFamily: 'Roboto-Regular',
     fontSize: 16,
     lineHeight: 18,
     fontWeight: '400',
   },
-  loginButtonText: {
+  secondaryActionButtonText: {
     color: colors.blue,
     fontFamily: 'Roboto-Regular',
     fontSize: 16,
