@@ -37,9 +37,7 @@ export const LoginScreen = () => {
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             style={styles.container}
           >
-            <View
-              style={[styles.formContainer, styles.formContainerLoginScreen]}
-            >
+            <View style={styles.formContainerLoginScreen}>
               <Text style={styles.title}>Увійти</Text>
 
               <View style={styles.formFields}>

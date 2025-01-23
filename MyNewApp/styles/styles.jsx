@@ -31,11 +31,17 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   formContainerLoginScreen: {
-    paddingTop: 24,
+    width: '100%',
+    paddingTop: 32,
+    paddingBottom: 80,
+    backgroundColor: colors.white,
+    borderTopRightRadius: 25,
+    borderTopLeftRadius: 25,
+    paddingHorizontal: 16,
   },
 
   title: {
-    marginBottom: 33,
+    marginBottom: 32,
     color: colors.black,
     textAlign: 'center',
     fontFamily: 'Roboto-Medium',
