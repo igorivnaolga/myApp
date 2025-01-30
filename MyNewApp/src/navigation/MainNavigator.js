@@ -12,7 +12,7 @@ export const MainNavigator = () => {
   const navigation = useNavigation();
   return (
     <Stack.Navigator
-      initialRouteName="Login"
+      initialRouteName="Registration"
       screenOptions={{
         headerShown: false,
       }}
