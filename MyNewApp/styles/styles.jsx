@@ -132,4 +132,12 @@ export const styles = StyleSheet.create({
     lineHeight: 18,
     fontWeight: '400',
   },
+  addButton: {
+    width: 70,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.orange,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });

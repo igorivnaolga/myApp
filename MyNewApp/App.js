@@ -1,6 +1,6 @@
 import { useFonts } from 'expo-font';
-import { RegistrationScreen } from './src/Screens/RegistrationScreen';
-import { LoginScreen } from './src/Screens/LoginScreen';
+import { NavigationContainer } from '@react-navigation/native';
+import { MainNavigator } from './src/navigation/MainNavigator';
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -13,9 +13,8 @@ export default function App() {
   }
 
   return (
-    <>
-      {/* <RegistrationScreen /> */}
-      <LoginScreen />;
-    </>
+    <NavigationContainer>
+      <MainNavigator />
+    </NavigationContainer>
   );
 }
