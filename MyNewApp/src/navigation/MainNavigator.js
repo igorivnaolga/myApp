@@ -5,6 +5,7 @@ import { MapScreen } from '../Screens/MapScreen';
 import { CommentsScreen } from '../Screens/CommentsScreen';
 import { useNavigation } from '@react-navigation/native';
 import { BottomTabNavigator } from './BottomTabNavigator';
+import { ArrowLeft } from '../../icons/ArrowLeft';
 
 const Stack = createStackNavigator();
 
@@ -12,7 +13,7 @@ export const MainNavigator = () => {
   const navigation = useNavigation();
   return (
     <Stack.Navigator
-      initialRouteName="Registration"
+      initialRouteName="Login"
       screenOptions={{
         headerShown: false,
       }}
