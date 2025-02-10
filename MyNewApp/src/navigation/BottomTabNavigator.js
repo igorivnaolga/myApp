@@ -8,6 +8,8 @@ import { ProfileScreen } from '../Screens/ProfileScreen';
 import { CreatePostsScreen } from '../Screens/CreatePostsScreen';
 import { LogoutButton } from '../Components/LogoutButton';
 import { PostsScreen } from '../Screens/PostsScreen';
+import { StyleSheet } from 'react-native';
+import { colors } from '../../styles/globalStyles';
 
 const Tab = createBottomTabNavigator();
 
@@ -79,3 +81,14 @@ export const BottomTabNavigator = ({ navigation }) => {
     </Tab.Navigator>
   );
 };
+
+const styles = StyleSheet.create({
+  addButton: {
+    width: 70,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.orange,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
