@@ -182,7 +182,11 @@ export const CreatePostsScreen = ({ navigation, route }) => {
           </View>
         </KeyboardAvoidingView>
 
-        <StyledButton onPress={onPublish} isDisabled={isDisabled}>
+        <StyledButton
+          onPress={onPublish}
+          isDisabled={isDisabled}
+          buttonStyles={[isDisabled && styles.disabledButton]}
+        >
           <Text
             style={{
               ...styles.btnText,
@@ -226,6 +230,9 @@ const styles = StyleSheet.create({
   },
   unactiveBtnText: {
     color: colors.text_gray,
+  },
+  disabledButton: {
+    backgroundColor: colors.light_gray,
   },
   grayText: {
     textAlign: 'left',

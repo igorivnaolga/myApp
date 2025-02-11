@@ -3,13 +3,18 @@
     "name": "MyNewApp",
     "slug": "MyNewApp",
     "version": "1.0.0",
-    "platforms": ["ios", "android", "web"],
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
     "android": {
       "config": {
         "googleMaps": {
           "apiKey": "AIzaSyDXfQK0mfIaQSUhD5zWzh-Eug53KB-DTt8"
         }
-      }
+      },
+      "package": "com.anonymous.MyNewApp"
     }
   }
 }
