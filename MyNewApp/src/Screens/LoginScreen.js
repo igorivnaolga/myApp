@@ -12,17 +12,29 @@ import {
 import { styles } from '../../styles/styles';
 import { StyledButton } from '../Components/StyledButton';
 
-export const LoginScreen = () => {
+export const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
+  const handleEmailChange = (value) => {
+    setEmail(value);
+  };
+
+  const handlePasswordChange = (value) => {
+    if (value.length < 20) {
+      setPassword(value);
+    }
+  };
+
   const onPressLogin = () => {
     console.log(`Log in with Email:${email}\nPassword:${password}`);
+    navigation.navigate('Home');
   };
 
   const onPressRegistration = () => {
     console.log('Registration pressed');
+    navigation.navigate('Registration');
   };
 
   return (
@@ -45,7 +57,7 @@ export const LoginScreen = () => {
                   placeholder="Адреса електронної пошти"
                   style={styles.input}
                   value={email}
-                  onChangeText={setEmail}
+                  onChangeText={handleEmailChange}
                 />
                 <View style={styles.passwordField}>
                   <TextInput
@@ -53,7 +65,7 @@ export const LoginScreen = () => {
                     style={styles.input}
                     secureTextEntry={!isPasswordVisible}
                     value={password}
-                    onChangeText={setPassword}
+                    onChangeText={handlePasswordChange}
                   />
                   <StyledButton
                     onPress={() => setIsPasswordVisible(!isPasswordVisible)}
