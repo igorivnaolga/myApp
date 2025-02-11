@@ -6,6 +6,7 @@ import { CommentsScreen } from '../Screens/CommentsScreen';
 import { useNavigation } from '@react-navigation/native';
 import { BottomTabNavigator } from '../navigation/BottomTabNavigator';
 import { ArrowLeft } from '../../icons/ArrowLeft';
+import CameraScreen from '../Screens/CameraScreen';
 
 const Stack = createStackNavigator();
 
@@ -13,7 +14,7 @@ export const MainNavigator = () => {
   const navigation = useNavigation();
   return (
     <Stack.Navigator
-      initialRouteName="Registration"
+      initialRouteName="Login"
       screenOptions={{
         headerShown: false,
       }}
@@ -21,6 +22,7 @@ export const MainNavigator = () => {
       <Stack.Screen name="Home" component={BottomTabNavigator} />
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Registration" component={RegistrationScreen} />
+      <Stack.Screen name="Camera" component={CameraScreen} />
       <Stack.Screen
         name="MapScreen"
         options={{

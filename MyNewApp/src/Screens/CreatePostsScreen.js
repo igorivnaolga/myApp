@@ -30,6 +30,10 @@ export const CreatePostsScreen = ({ navigation, route }) => {
   const placesRef = useRef(null);
   const [location, setLocation] = useState(null);
 
+  const navigateToCameraScreen = async () => {
+    navigation.navigate('Camera');
+  };
+
   const pickImage = async () => {
     const permissionResult =
       await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -101,7 +105,7 @@ export const CreatePostsScreen = ({ navigation, route }) => {
       <View style={styles.imageContainer}>
         <View style={styles.emptyImgContainer}>
           {!selectedImage ? (
-            <CameraIcon style={styles.camera}>
+            <CameraIcon style={styles.camera} onPress={navigateToCameraScreen}>
               <View style={styles.cameraContent}>
                 <TouchableOpacity style={styles.cameraIconWrapper}>
                   <CameraIcon width={24} height={24} />
