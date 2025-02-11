@@ -23,9 +23,10 @@ export const PostsScreen = ({ navigation, route }) => {
           title={post.title}
           location={post.address}
           onLocationPress={() => navigation.navigate('MapScreen', { post })}
-          onCommentsPress={() =>
-            navigation.navigate('CommentsScreen', { post })
-          }
+          onCommentsPress={() => {
+            console.log('Navigating with post:', post);
+            navigation.navigate('CommentsScreen', { post });
+          }}
         />
       )}
     </View>

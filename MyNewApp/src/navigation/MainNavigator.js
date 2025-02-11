@@ -13,7 +13,7 @@ export const MainNavigator = () => {
   const navigation = useNavigation();
   return (
     <Stack.Navigator
-      initialRouteName="CommentsScreen"
+      initialRouteName="Registration"
       screenOptions={{
         headerShown: false,
       }}

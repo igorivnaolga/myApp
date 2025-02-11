@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import {
+  Image,
   ImageBackground,
   Keyboard,
   KeyboardAvoidingView,
@@ -11,26 +12,70 @@ import {
 } from 'react-native';
 import { styles } from '../../styles/styles';
 import { CirclePlusSvg } from '../../icons/CirclePlusSvg';
+import { CircleCrossSvg } from '../../icons/CircleCrossSvg';
 import { StyledButton } from '../Components/StyledButton';
+import * as ImagePicker from 'expo-image-picker';
 
-export const RegistrationScreen = () => {
+export const RegistrationScreen = ({ navigation }) => {
+  const [photo, setPhoto] = useState('');
   const [login, setLogin] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
+  const handlePhotoUpload = async () => {
+    try {
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+      if (status !== 'granted') {
+        alert('Permission to access media library is required!');
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: 'images',
+        allowsEditing: false,
+        quality: 1,
+      });
+
+      if (!result.canceled) {
+        setPhoto(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.log('Error while downloading photo', error);
+      alert('Error while downloading photo');
+    }
+  };
+
+  const handlePhotoRemove = () => {
+    setPhoto('');
+  };
+
+  const handleLoginChange = (value) => {
+    setLogin(value);
+  };
+
+  const handleEmailChange = (value) => {
+    setEmail(value);
+  };
+
+  const handlePasswordChange = (value) => {
+    if (value.length < 20) {
+      setPassword(value);
+    }
+  };
+
   const onPressRegistration = () => {
     console.log(
       `Registration with Login: ${login}\nEmail:${email}\nPassword:${password}`
     );
+    navigation.navigate('Home');
   };
 
   const onPressLogin = () => {
     console.log('Login pressed');
-  };
-
-  const onPressChangeAvatar = () => {
-    console.log('Change avatar pressed');
+    navigation.navigate('Login');
   };
 
   return (
@@ -47,12 +92,24 @@ export const RegistrationScreen = () => {
           >
             <View style={styles.formContainer}>
               <View style={styles.avatar}>
-                <StyledButton
-                  buttonStyles={styles.avatarButton}
-                  onPress={onPressChangeAvatar}
-                >
-                  <CirclePlusSvg />
-                </StyledButton>
+                {photo ? (
+                  <>
+                    <Image source={{ uri: photo }} style={styles.photo} />
+                    <StyledButton
+                      buttonStyles={styles.avatarButton}
+                      onPress={handlePhotoRemove}
+                    >
+                      <CircleCrossSvg />
+                    </StyledButton>
+                  </>
+                ) : (
+                  <StyledButton
+                    onPress={handlePhotoUpload}
+                    buttonStyles={styles.avatarButton}
+                  >
+                    <CirclePlusSvg />
+                  </StyledButton>
+                )}
               </View>
 
               <Text style={styles.title}>Реєстрація</Text>
@@ -62,13 +119,13 @@ export const RegistrationScreen = () => {
                   placeholder="Логін"
                   style={styles.input}
                   value={login}
-                  onChangeText={setLogin}
+                  onChangeText={handleLoginChange}
                 />
                 <TextInput
                   placeholder="Адреса електронної пошти"
                   style={styles.input}
                   value={email}
-                  onChangeText={setEmail}
+                  onChangeText={handleEmailChange}
                 />
                 <View style={styles.passwordField}>
                   <TextInput
@@ -76,7 +133,7 @@ export const RegistrationScreen = () => {
                     style={styles.input}
                     secureTextEntry={!isPasswordVisible}
                     value={password}
-                    onChangeText={setPassword}
+                    onChangeText={handlePasswordChange}
                   />
                   <StyledButton
                     onPress={() => setIsPasswordVisible(!isPasswordVisible)}
