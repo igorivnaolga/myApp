@@ -1,8 +1,8 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import PostsIcon from '../../icons/PostsIcon';
-import UserIcon from '../../icons/UserIcon';
-import WideCirclePlus from '../../icons/WideCirclePlus';
-import ArrowLeft from '../../icons/ArrowLeft';
+import { PostsIcon } from '../../icons/PostsIcon';
+import { UserIcon } from '../../icons/UserIcon';
+import { WideCirclePlus } from '../../icons/WideCirclePlus';
+import { ArrowLeft } from '../../icons/ArrowLeft';
 
 import { ProfileScreen } from '../Screens/ProfileScreen';
 import { CreatePostsScreen } from '../Screens/CreatePostsScreen';

@@ -4,7 +4,7 @@ import { RegistrationScreen } from '../Screens/RegistrationScreen';
 import { MapScreen } from '../Screens/MapScreen';
 import { CommentsScreen } from '../Screens/CommentsScreen';
 import { useNavigation } from '@react-navigation/native';
-import { BottomTabNavigator } from './BottomTabNavigator';
+import { BottomTabNavigator } from '../navigation/BottomTabNavigator';
 import { ArrowLeft } from '../../icons/ArrowLeft';
 
 const Stack = createStackNavigator();
