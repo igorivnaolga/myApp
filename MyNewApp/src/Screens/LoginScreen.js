@@ -11,8 +11,11 @@ import {
 } from 'react-native';
 import { styles } from '../../styles/styles';
 import { StyledButton } from '../Components/StyledButton';
+import { useDispatch } from 'react-redux';
+import { loginUser } from '../../utils/auth';
 
 export const LoginScreen = ({ navigation }) => {
+  const dispatch = useDispatch();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -27,9 +30,14 @@ export const LoginScreen = ({ navigation }) => {
     }
   };
 
-  const onPressLogin = () => {
-    console.log(`Log in with Email:${email}\nPassword:${password}`);
-    navigation.navigate('Home');
+  const onPressLogin = async () => {
+    await loginUser({ email, password }, dispatch);
+  };
+
+  const checkFormFilled = () => {
+    if (user.email && user.password) {
+      setUser((prev) => ({ ...prev, isFormFilled: true }));
+    }
   };
 
   const onPressRegistration = () => {
@@ -58,6 +66,7 @@ export const LoginScreen = ({ navigation }) => {
                   style={styles.input}
                   value={email}
                   onChangeText={handleEmailChange}
+                  onBlurInput={checkFormFilled}
                 />
                 <View style={styles.passwordField}>
                   <TextInput
@@ -66,6 +75,7 @@ export const LoginScreen = ({ navigation }) => {
                     secureTextEntry={!isPasswordVisible}
                     value={password}
                     onChangeText={handlePasswordChange}
+                    onBlurInput={checkFormFilled}
                   />
                   <StyledButton
                     onPress={() => setIsPasswordVisible(!isPasswordVisible)}

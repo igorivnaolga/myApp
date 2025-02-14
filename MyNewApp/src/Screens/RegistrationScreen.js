@@ -15,13 +15,20 @@ import { CirclePlusSvg } from '../../icons/CirclePlusSvg';
 import { CircleCrossSvg } from '../../icons/CircleCrossSvg';
 import { StyledButton } from '../Components/StyledButton';
 import * as ImagePicker from 'expo-image-picker';
+import { registerUser } from '../../utils/auth';
+import { useDispatch } from 'react-redux';
 
 export const RegistrationScreen = ({ navigation }) => {
+  const dispatch = useDispatch();
   const [photo, setPhoto] = useState('');
   const [login, setLogin] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+
+  useEffect(() => {
+    checkFormFilled();
+  }, [user.photo]);
 
   const handlePhotoUpload = async () => {
     try {
@@ -66,10 +73,11 @@ export const RegistrationScreen = ({ navigation }) => {
     }
   };
 
-  const onPressRegistration = () => {
-    console.log(
-      `Registration with Login: ${login}\nEmail:${email}\nPassword:${password}`
-    );
+  const onPressRegistration = async () => {
+    if (!user.isFormFilled) return;
+
+    await registerUser({ email, password, login, photo }, dispatch);
+
     navigation.navigate('Home');
   };
 

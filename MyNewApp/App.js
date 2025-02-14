@@ -1,10 +1,11 @@
 import { useFonts } from 'expo-font';
 import { NavigationContainer } from '@react-navigation/native';
 import { MainNavigator } from './src/navigation/MainNavigator';
-import { Provider, useDispatch } from 'react-redux';
+import { Provider, useDispatch, useSelector } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import store from './src/redux/store/store';
 import { useEffect } from 'react';
+import { authStateChanged } from './utils/auth';
 
 export default function App() {
   const [fontsLoaded] = useFonts({
