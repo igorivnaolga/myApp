@@ -104,27 +104,60 @@ export const getData = async (userId, collection = 'users') => {
   }
 };
 
+// export const uploadImage = async (
+//   userId,
+//   uri,
+//   fileName,
+//   path = 'profilePhotos'
+// ) => {
+//   const response = await fetch(uri);
+//   const file = await response.blob();
+//   const fileNameFromUri = uri.split('/').pop();
+//   const fileType = file.type;
+//   const imageFile = new File([file], fileNameFromUri, { type: fileType });
+
+//   try {
+//     const imageRef = ref(
+//       storage,
+//       `${path}/${userId}/${fileName.toLowerCase()}`
+//     );
+
+//     await uploadBytes(imageRef, imageFile);
+
+//     const imageUrl = await getImageUrl(imageRef);
+//     console.log('Upload image done');
+//     return imageUrl;
+//   } catch (error) {
+//     console.error('Error uploading image:', error);
+//     throw error;
+//   }
+// };
+
 export const uploadImage = async (
   userId,
   uri,
   fileName,
   path = 'profilePhotos'
 ) => {
-  const response = await fetch(uri);
-  const file = await response.blob();
-  const fileNameFromUri = uri.split('/').pop();
-  const fileType = file.type;
-  const imageFile = new File([file], fileNameFromUri, { type: fileType });
-
   try {
+    // Fetch the file from the URI
+    const response = await fetch(uri);
+    const fileBlob = await response.blob();
+    // Optionally, if you need metadata:
+    const metadata = {
+      contentType: fileBlob.type,
+    };
+
+    // Create a reference to the storage location
     const imageRef = ref(
       storage,
       `${path}/${userId}/${fileName.toLowerCase()}`
     );
 
-    await uploadBytes(imageRef, imageFile);
+    // Upload the blob (you can pass metadata as the third argument)
+    await uploadBytes(imageRef, fileBlob, metadata);
 
-    const imageUrl = await getImageUrl(imageRef);
+    const imageUrl = await getDownloadURL(imageRef);
     console.log('Upload image done');
     return imageUrl;
   } catch (error) {

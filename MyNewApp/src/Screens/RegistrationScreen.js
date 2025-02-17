@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Image,
   ImageBackground,
@@ -25,10 +25,6 @@ export const RegistrationScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-
-  useEffect(() => {
-    checkFormFilled();
-  }, [user.photo]);
 
   const handlePhotoUpload = async () => {
     try {
@@ -74,11 +70,8 @@ export const RegistrationScreen = ({ navigation }) => {
   };
 
   const onPressRegistration = async () => {
-    if (!user.isFormFilled) return;
-
-    await registerUser({ email, password, login, photo }, dispatch);
-
-    navigation.navigate('Home');
+    console.log(login, email, password, photo);
+    dispatch(registerUser({ email, password, login, photo }));
   };
 
   const onPressLogin = () => {

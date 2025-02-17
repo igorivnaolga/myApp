@@ -5,12 +5,12 @@ import {
   signOut,
   updateProfile,
 } from 'firebase/auth';
-import { auth } from '../utils/auth';
+import { auth } from '../config';
 import { setUserInfo, clearUserInfo } from '../src/redux/reducers/userSlice';
 import { addUser, getData, getUser, uploadImage } from './firestore';
 
 export const registerUser = async (
-  { email, password, login, photo },
+  { email, password, login, photo = '' },
   dispatch
 ) => {
   try {
@@ -19,6 +19,7 @@ export const registerUser = async (
       email,
       password
     );
+    console.log(credentials);
     const user = credentials.user;
 
     const imageUrl = await uploadImage(user.uid, photo, 'avatar');
@@ -51,6 +52,10 @@ export const loginUser = async ({ email, password }, dispatch) => {
     const { uid } = credentials.user;
 
     const user = await getData(uid);
+    if (!user) {
+      console.error('User data not found in Firestore');
+      return;
+    }
 
     const userData = {
       uid: user.uid,
