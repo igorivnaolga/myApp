@@ -19,8 +19,9 @@ export const registerUser = async (
       email,
       password
     );
-    console.log(credentials);
+    console.log('User credentials:', credentials);
     const user = credentials.user;
+    console.log('Photo URI before upload:', photo);
 
     const imageUrl = await uploadImage(user.uid, photo, 'avatar');
 
