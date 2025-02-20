@@ -1,35 +1,58 @@
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { colors } from '../../styles/globalStyles';
 import { Post } from '../Components/Post';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectInfo } from '../redux/reducers/userSlice';
+import { selectPosts } from '../redux/reducers/postsSlice';
+import { fetchPosts } from '../redux/reducers/operation';
+import { useEffect } from 'react';
+import { ScrollView } from 'react-native-gesture-handler';
 
-export const PostsScreen = ({ navigation, route }) => {
-  const post = route?.params?.post;
+export const PostsScreen = () => {
+  const user = useSelector(selectInfo);
+  const posts = useSelector(selectPosts);
+  const dispatch = useDispatch();
+
+  const prepareData = (data) => {
+    if (!data || data.length === 0) return [];
+    return data.map((el) => {
+      const { likes, ...data } = el;
+      return data;
+    });
+  };
+
+  const preparedPosts = prepareData(posts);
+
+  useEffect(() => {
+    dispatch(fetchPosts(user.uid));
+  }, [dispatch]);
 
   return (
-    <View style={styles.container}>
-      <View style={styles.userContainer}>
-        <Image
-          source={require('../../images/avatar.jpg')}
-          style={styles.avatar}
-        />
-        <View style={styles.userInfo}>
-          <Text style={styles.userName}>Natali Romanova</Text>
-          <Text style={styles.userEmail}>email@example.com</Text>
+    <ScrollView>
+      {user && (
+        <View style={styles.container}>
+          <View style={styles.userContainer}>
+            <Image
+              source={
+                !!user.photo
+                  ? { uri: user.photo }
+                  : require('../../images/avatar.jpg')
+              }
+              style={styles.avatar}
+            />
+            <View style={styles.userInfo}>
+              <Text style={styles.userName}>{user.displayName}</Text>
+              <Text style={styles.userEmail}>{user.email}</Text>
+            </View>
+          </View>
+          <View style={styles.postsWrapper}>
+            {preparedPosts.map((post) => (
+              <Post post={post} key={post.id} />
+            ))}
+          </View>
         </View>
-      </View>
-      {post && (
-        <Post
-          image={{ uri: post.image }}
-          title={post.title}
-          location={post.address}
-          onLocationPress={() => navigation.navigate('MapScreen', { post })}
-          onCommentsPress={() => {
-            console.log('Navigating with post:', post);
-            navigation.navigate('CommentsScreen', { post });
-          }}
-        />
       )}
-    </View>
+    </ScrollView>
   );
 };
 

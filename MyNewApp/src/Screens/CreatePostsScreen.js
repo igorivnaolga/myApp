@@ -20,15 +20,20 @@ import { colors } from '../../styles/globalStyles';
 
 import { StyledButton } from '../Components/StyledButton';
 import { Input } from '../Components/Input';
+import { addPost, uploadImage } from '../../utils/firestore';
+import { nanoid } from '@reduxjs/toolkit';
 
 const PLACES_KEY = 'AIzaSyA-uCvWguBzl0M97bS7rRUMikXj_YEJxts';
 
 export const CreatePostsScreen = ({ navigation, route }) => {
+  const params = route?.params;
   const [selectedImage, setSelectedImage] = useState(null);
+  const [uploadedImage, setUploadedImage] = useState(null);
   const [title, setTitle] = useState('');
   const [address, setAddress] = useState('');
-  const placesRef = useRef(null);
-  const [location, setLocation] = useState(null);
+  const [status, requestPermission] = ImagePicker.useCameraPermissions();
+  const autocompleteRef = useRef(null);
+  // const user = useSelector((state) => state.user.userInfo);
 
   const navigateToCameraScreen = async () => {
     navigation.navigate('Camera');
@@ -56,49 +61,62 @@ export const CreatePostsScreen = ({ navigation, route }) => {
     }
   };
 
-  const onClearData = () => {
-    setSelectedImage(null);
-    setTitle('');
-    setAddress('');
-    placesRef.current?.clear();
-  };
+  const uploadImageToStorage = async () => {
+    if (!selectedImage) return;
 
-  const onPublish = async () => {
     try {
-      let { status } = await Location.requestForegroundPermissionsAsync();
+      const response = await fetch(selectedImage);
+      const file = await response.blob();
+      const fileName = selectedImage.split('/').pop(); // Отримуємо ім'я файлу з URI
+      const fileType = file.type; // Отримуємо тип файлу
+      const imageFile = new File([file], fileName, { type: fileType });
 
-      if (status !== 'granted') {
-        alert('Need permission to get location');
-        return;
-      }
+      const uploadedImageUrl = await uploadImage(user.uid, imageFile, fileName);
 
-      const currentLocation = await Location.getCurrentPositionAsync({});
-      setLocation(currentLocation.coords);
-
-      const post = {
-        image: selectedImage,
-        title,
-        address,
-        location: {
-          latitude: currentLocation.coords.latitude,
-          longitude: currentLocation.coords.longitude,
-        },
-      };
-
-      console.log('Post with location:', post);
-
-      onClearData();
-
-      navigation.navigate('PostsScreen', {
-        post: post,
-      });
-    } catch (error) {
-      console.log('Error publishing post:', error);
-      alert('Error publishing post');
+      return uploadedImageUrl;
+    } catch (e) {
+      console.log(e);
+      return null;
     }
   };
 
-  const isDisabled = !(title && address && selectedImage);
+  const onClearData = () => {
+    setSelectedImage('');
+    setUploadedImage('');
+    setTitle('');
+    setAddress('');
+    autocompleteRef?.current?.setAddressText('');
+  };
+
+  useEffect(() => {
+    if (!params?.photo) return;
+
+    setSelectedImage(params.photo);
+  }, [params]);
+
+  const onPublish = async () => {
+    if (!user) return;
+
+    try {
+      const imageUrl = await uploadImageToStorage();
+      const postId = nanoid();
+
+      await addPost(postId, {
+        address,
+        id: postId,
+        image: imageUrl,
+        userId: user.uid,
+        title,
+        comments: [],
+      });
+
+      Alert.alert('Пост успішно створено!');
+      onClearData();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const isDisabled = !title || !address || !selectedImage;
 
   return (
     <View style={styles.section}>
@@ -144,7 +162,7 @@ export const CreatePostsScreen = ({ navigation, route }) => {
           <View style={styles.locationInputContainer}>
             <MapMarkerGray width={24} height={24} style={styles.mapMarker} />
             <GooglePlacesAutocomplete
-              ref={placesRef}
+              ref={autocompleteRef}
               placeholder="Місцевість..."
               minLength={4}
               enablePoweredByContainer={false}

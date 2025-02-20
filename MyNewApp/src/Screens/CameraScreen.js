@@ -3,7 +3,7 @@ import { Text, View, TouchableOpacity, StyleSheet, Button } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as MediaLibrary from 'expo-media-library';
 
-const CameraScreen = ({ navigation }) => {
+export const CameraScreen = ({ navigation }) => {
   const [facing, setFacing] = useState('back');
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
   const [libraryPermission, requestLibraryPermission] =
@@ -59,8 +59,6 @@ const CameraScreen = ({ navigation }) => {
     </View>
   );
 };
-
-export default CameraScreen;
 
 const styles = StyleSheet.create({
   container: {

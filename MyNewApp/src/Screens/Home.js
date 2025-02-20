@@ -1,5 +1,7 @@
-import BottomTabNavigator from '../navigation/BottomTabNavigator';
-
 export const Home = () => {
-  return <BottomTabNavigator />;
+  return (
+    <View>
+      <Text>Home</Text>
+    </View>
+  );
 };

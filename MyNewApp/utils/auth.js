@@ -9,67 +9,40 @@ import { auth } from '../config';
 import { setUserInfo, clearUserInfo } from '../src/redux/reducers/userSlice';
 import { addUser, getData, getUser, uploadImage } from './firestore';
 
-export const registerUser = async (
-  { email, password, login, photo = '' },
-  dispatch
-) => {
+export const registerUser = async ({ email, password, login }) => {
   try {
     const credentials = await createUserWithEmailAndPassword(
       auth,
       email,
       password
     );
-    console.log('User credentials:', credentials);
     const user = credentials.user;
-    console.log('Photo URI before upload:', photo);
 
-    const imageUrl = await uploadImage(user.uid, photo, 'avatar');
-
-    const userData = {
+    await addUser(user.uid, {
       uid: user.uid,
       email: user.email || '',
       displayName: login || '',
-      photo: imageUrl || '',
-    };
-
-    await addUser(user.uid, {
-      ...userData,
     });
-
-    dispatch(
-      setUserInfo({
-        ...userData,
-      })
-    );
   } catch (error) {
-    console.log('SIGNUP ERROR:', error);
+    console.log('Signup error:', error);
   }
 };
 
 export const loginUser = async ({ email, password }, dispatch) => {
   try {
     const credentials = await signInWithEmailAndPassword(auth, email, password);
-
-    const { uid } = credentials.user;
-
-    const user = await getData(uid);
-    if (!user) {
-      console.error('User data not found in Firestore');
-      return;
-    }
-
-    const userData = {
-      uid: user.uid,
-      email: user.email || '',
-      displayName: user.displayName || '',
-      photo: user.photo || '',
-    };
+    console.log(credentials);
+    const user = credentials.user;
 
     dispatch(
       setUserInfo({
-        ...userData,
+        uid: user.uid,
+        email: user?.email || '',
+        displayName: user?.displayName || '',
+        profilePhoto: user?.photoURL || '',
       })
     );
+    return user;
   } catch (error) {
     console.log(error);
   }

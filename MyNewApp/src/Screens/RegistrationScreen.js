@@ -70,8 +70,8 @@ export const RegistrationScreen = ({ navigation }) => {
   };
 
   const onPressRegistration = async () => {
-    console.log(login, email, password, photo);
-    dispatch(registerUser({ email, password, login, photo }));
+    console.log('Sign up!');
+    registerUser({ email, password });
   };
 
   const onPressLogin = () => {

@@ -1,15 +1,13 @@
 import {
+  arrayUnion,
+  collection,
   doc,
   getDoc,
-  setDoc,
-  addDoc,
-  collection,
-  updateDoc,
   getDocs,
-  where,
   query,
-  arrayUnion,
-  deleteDoc,
+  setDoc,
+  updateDoc,
+  where,
 } from 'firebase/firestore';
 import { db, storage } from '../config';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
@@ -104,83 +102,28 @@ export const getData = async (userId, collection = 'users') => {
   }
 };
 
-// export const uploadImage = async (
-//   userId,
-//   uri,
-//   fileName,
-//   path = 'profilePhotos'
-// ) => {
-//   const response = await fetch(uri);
-//   const file = await response.blob();
-//   const fileNameFromUri = uri.split('/').pop();
-//   const fileType = file.type;
-//   const imageFile = new File([file], fileNameFromUri, { type: fileType });
-
-//   try {
-//     const imageRef = ref(
-//       storage,
-//       `${path}/${userId}/${fileName.toLowerCase()}`
-//     );
-
-//     await uploadBytes(imageRef, imageFile);
-
-//     const imageUrl = await getImageUrl(imageRef);
-//     console.log('Upload image done');
-//     return imageUrl;
-//   } catch (error) {
-//     console.error('Error uploading image:', error);
-//     throw error;
-//   }
-// };
-
-// Convert URI to Blob
-const uriToBlob = async (uri) => {
-  try {
-    const response = await fetch(uri);
-    const blob = await response.blob();
-
-    // Ensure content type is set correctly
-    if (!blob.type || blob.type === '') {
-      return new Blob([blob], { type: 'image/jpeg' }); // Default to JPEG
-    }
-    return blob;
-  } catch (error) {
-    console.error('Error converting URI to blob:', error);
-    throw error;
-  }
-};
-
-// Upload Image to Firebase Storage
 export const uploadImage = async (
   userId,
   uri,
   fileName,
   path = 'profilePhotos'
 ) => {
+  const response = await fetch(uri);
+  const file = await response.blob();
+  const fileNameFromUri = uri.split('/').pop();
+  const fileType = file.type;
+  const imageFile = new File([file], fileNameFromUri, { type: fileType });
+
   try {
-    console.log('Uploading image from URI:', uri);
-
-    // Convert to Blob
-    const fileBlob = await uriToBlob(uri);
-
-    // Define metadata
-    const metadata = {
-      contentType: fileBlob.type, // Ensure proper MIME type
-    };
-
-    // Storage reference
     const imageRef = ref(
       storage,
       `${path}/${userId}/${fileName.toLowerCase()}`
     );
 
-    // Upload file to Firebase Storage
-    await uploadBytes(imageRef, fileBlob, metadata);
+    await uploadBytes(imageRef, imageFile);
 
-    // Get the URL of uploaded file
-    const imageUrl = await getDownloadURL(imageRef);
-    console.log('Image uploaded successfully:', imageUrl);
-
+    const imageUrl = await getImageUrl(imageRef);
+    console.log('Upload image done');
     return imageUrl;
   } catch (error) {
     console.error('Error uploading image:', error);

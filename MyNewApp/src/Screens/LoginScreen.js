@@ -14,7 +14,7 @@ import { StyledButton } from '../Components/StyledButton';
 import { useDispatch } from 'react-redux';
 import { loginUser } from '../../utils/auth';
 
-export const LoginScreen = ({ navigation }) => {
+export const LoginScreen = ({ route, navigation }) => {
   const dispatch = useDispatch();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -31,7 +31,14 @@ export const LoginScreen = ({ navigation }) => {
   };
 
   const onPressLogin = async () => {
-    await loginUser({ email, password }, dispatch);
+    console.log('onLogin');
+
+    try {
+      await loginUser({ email, password }, dispatch);
+    } catch (error) {
+      Alert.alert('error');
+      console.error('Login error:', error);
+    }
   };
 
   const checkFormFilled = () => {
@@ -42,7 +49,7 @@ export const LoginScreen = ({ navigation }) => {
 
   const onPressRegistration = () => {
     console.log('Registration pressed');
-    navigation.navigate('Registration');
+    navigation.navigate('Registration', { email, password });
   };
 
   return (

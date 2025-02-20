@@ -28,12 +28,10 @@ export default function App() {
 
 const AuthListener = () => {
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.user.userInfo);
 
   useEffect(() => {
     authStateChanged(dispatch);
   }, [dispatch]);
-
   return (
     <NavigationContainer>
       <MainNavigator />
