@@ -13,32 +13,25 @@ import { styles } from '../../styles/styles';
 import { StyledButton } from '../Components/StyledButton';
 import { useDispatch } from 'react-redux';
 import { loginUser } from '../../utils/auth';
+import { useNavigation } from '@react-navigation/native';
+import { LOGIN_INITIAL_STATE } from '../constants/constants';
 
-export const LoginScreen = ({ route, navigation }) => {
+export const LoginScreen = () => {
+  const [user, setUser] = useState(LOGIN_INITIAL_STATE);
+  const navigation = useNavigation();
   const dispatch = useDispatch();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
-  const handleEmailChange = (value) => {
-    setEmail(value);
-  };
+  const onChangeUserData = (key, value) => {
+    if (key === 'isPasswordHidden')
+      return setUser((prev) => ({ ...prev, [key]: !user.isPasswordHidden }));
 
-  const handlePasswordChange = (value) => {
-    if (value.length < 20) {
-      setPassword(value);
-    }
+    setUser((prev) => ({ ...prev, [key]: value }));
   };
 
   const onPressLogin = async () => {
-    console.log('onLogin');
+    const { email, password } = user;
 
-    try {
-      await loginUser({ email, password }, dispatch);
-    } catch (error) {
-      Alert.alert('error');
-      console.error('Login error:', error);
-    }
+    await loginUser({ email, password }, dispatch);
   };
 
   const checkFormFilled = () => {
@@ -46,10 +39,8 @@ export const LoginScreen = ({ route, navigation }) => {
       setUser((prev) => ({ ...prev, isFormFilled: true }));
     }
   };
-
   const onPressRegistration = () => {
-    console.log('Registration pressed');
-    navigation.navigate('Registration', { email, password });
+    navigation.navigate('Registration');
   };
 
   return (
@@ -71,25 +62,25 @@ export const LoginScreen = ({ route, navigation }) => {
                 <TextInput
                   placeholder="Адреса електронної пошти"
                   style={styles.input}
-                  value={email}
-                  onChangeText={handleEmailChange}
+                  value={user.email}
+                  onChangeText={(text) => onChangeUserData('email', text)}
                   onBlurInput={checkFormFilled}
                 />
                 <View style={styles.passwordField}>
                   <TextInput
                     placeholder="Пароль"
                     style={styles.input}
-                    secureTextEntry={!isPasswordVisible}
-                    value={password}
-                    onChangeText={handlePasswordChange}
-                    onBlurInput={checkFormFilled}
+                    secureTextEntry={user.isPasswordHidden}
+                    value={user.password}
+                    onChangeText={(text) => onChangeUserData('password', text)}
+                    onBlur={checkFormFilled}
                   />
                   <StyledButton
-                    onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+                    onPress={() => onChangeUserData('isPasswordHidden')}
                     buttonStyles={styles.passwordButton}
                   >
                     <Text style={styles.passwordButtonText}>
-                      {isPasswordVisible ? 'Приховати' : 'Показати'}
+                      {user.isPasswordHidden ? 'Показати' : 'Приховати'}
                     </Text>
                   </StyledButton>
                 </View>
@@ -99,6 +90,7 @@ export const LoginScreen = ({ route, navigation }) => {
                 buttonStyles={styles.mainActionButton}
                 onPress={onPressLogin}
               >
+                disabled={!user.isFormFilled}
                 <Text style={styles.mainActionButtonText}>Увійти</Text>
               </StyledButton>
 

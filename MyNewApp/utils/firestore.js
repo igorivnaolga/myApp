@@ -1,6 +1,7 @@
 import {
   arrayUnion,
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -102,31 +103,118 @@ export const getData = async (userId, collection = 'users') => {
   }
 };
 
+// export const uploadImage = async (
+//   userId,
+//   uri,
+//   fileName,
+//   path = 'profilePhotos'
+// ) => {
+//   const response = await fetch(uri);
+//   const file = await response.blob();
+//   const fileNameFromUri = uri.split('/').pop();
+//   const fileType = file.type;
+//   const imageFile = new File([file], fileNameFromUri, { type: fileType });
+
+//   try {
+//     const imageRef = ref(
+//       storage,
+//       `${path}/${userId}/${fileName.toLowerCase()}`
+//     );
+
+//     await uploadBytes(imageRef, imageFile);
+
+//     const imageUrl = await getImageUrl(imageRef);
+//     console.log('Upload image done');
+//     return imageUrl;
+//   } catch (error) {
+//     console.error('Error uploading image:', error);
+//     throw error;
+//   }
+// };
+
+// export const uploadImage = async (
+//   userId,
+//   blob,
+//   fileName,
+//   path = 'profilePhotos'
+// ) => {
+//   try {
+//     const imageRef = ref(
+//       storage,
+//       `${path}/${userId}/${fileName.toLowerCase()}`
+//     );
+
+//     await uploadBytes(imageRef, blob); // ✅ Upload the blob directly
+//     const imageUrl = await getDownloadURL(imageRef); // ✅ Get the URL after upload
+
+//     console.log('Upload successful:', imageUrl);
+//     return imageUrl;
+//   } catch (error) {
+//     console.error('Error uploading image:', error);
+//     throw error;
+//   }
+// };
+
+// export const uploadImage = async (
+//   userId,
+//   uri,
+//   fileName,
+//   path = 'profilePhotos'
+// ) => {
+//   const response = await fetch(uri);
+//   const file = await response.blob();
+//   const fileNameFromUri = uri.split('/').pop();
+//   const fileType = file.type;
+//   const imageFile = new File([file], fileNameFromUri, { type: fileType });
+
+//   try {
+//     const imageRef = ref(
+//       storage,
+//       `${path}/${userId}/${fileName.toLowerCase()}`
+//     );
+
+//     await uploadBytes(imageRef, imageFile);
+
+//     const imageUrl = await getImageUrl(imageRef);
+//     console.log('Upload image done');
+//     return imageUrl;
+//   } catch (error) {
+//     console.error('Error uploading image:', error);
+//     throw error;
+//   }
+// };
+
 export const uploadImage = async (
   userId,
   uri,
   fileName,
   path = 'profilePhotos'
 ) => {
-  const response = await fetch(uri);
-  const file = await response.blob();
-  const fileNameFromUri = uri.split('/').pop();
-  const fileType = file.type;
-  const imageFile = new File([file], fileNameFromUri, { type: fileType });
-
   try {
+    if (!uri || !userId) throw new Error('❌ Invalid URI or userId');
+
+    console.log('📸 Fetching image:', uri);
+
+    const response = await fetch(uri);
+    const file = await response.blob();
+
+    console.log('🔄 Converting to Blob:', file.type);
+
+    // Fix: Ensure correct blob slicing
+    const slicedBlob = file.slice(0, file.size, file.type);
+
     const imageRef = ref(
       storage,
       `${path}/${userId}/${fileName.toLowerCase()}`
     );
 
-    await uploadBytes(imageRef, imageFile);
+    await uploadBytes(imageRef, slicedBlob);
 
-    const imageUrl = await getImageUrl(imageRef);
-    console.log('Upload image done');
+    const imageUrl = await getDownloadURL(imageRef);
+    console.log('✅ Upload successful:', imageUrl);
     return imageUrl;
   } catch (error) {
-    console.error('Error uploading image:', error);
+    console.error('🔥 Firebase Upload Error:', error);
     throw error;
   }
 };

@@ -9,6 +9,7 @@ import { useSelector } from 'react-redux';
 import { selectInfo } from '../redux/reducers/userSlice';
 import { BottomTabNavigator } from '../navigation/BottomTabNavigator';
 import { colors } from '../../styles/globalStyles';
+import { CreatePostsScreen } from '../Screens/CreatePostsScreen';
 
 const Stack = createStackNavigator();
 
@@ -48,6 +49,10 @@ export const MainNavigator = () => {
                 </StyledButton>
               ),
             })}
+          />
+          <Stack.Screen
+            name="CreatePostsScreen"
+            component={CreatePostsScreen}
           />
           <Stack.Screen
             name="Comments"

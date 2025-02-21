@@ -10,6 +10,7 @@ import { LogoutButton } from '../Components/LogoutButton';
 import { PostsScreen } from '../Screens/PostsScreen';
 import { StyleSheet } from 'react-native';
 import { colors } from '../../styles/globalStyles';
+import { logoutUser } from '../../utils/auth';
 
 const Tab = createBottomTabNavigator();
 
@@ -41,10 +42,16 @@ export const BottomTabNavigator = ({ navigation }) => {
           headerRight: () => (
             <LogoutButton
               style={{ paddingRight: 10 }}
-              onPress={() => navigation.navigate('Login')}
+              onPress={() => logoutUser(dispatch)}
             />
           ),
-          tabBarIcon: ({ focused }) => <PostsIcon width={24} height={24} />,
+          tabBarIcon: ({ focused }) => (
+            <PostsIcon
+              width={24}
+              height={24}
+              color={focused ? colors.orange : 'black'}
+            />
+          ),
         })}
       />
 
@@ -55,7 +62,11 @@ export const BottomTabNavigator = ({ navigation }) => {
           title: 'Створити публікацію',
           tabBarStyle: { display: 'none' },
           tabBarIcon: ({ focused }) => (
-            <WideCirclePlus width={70} height={40} />
+            <WideCirclePlus
+              width={70}
+              height={40}
+              color={focused ? colors.orange : 'black'}
+            />
           ),
           headerLeft: () => (
             <ArrowLeft
@@ -71,11 +82,17 @@ export const BottomTabNavigator = ({ navigation }) => {
       <Tab.Screen
         name="Profile"
         component={ProfileScreen}
-        options={({ navigation }) => ({
+        options={() => ({
           title: 'Profile',
           headerRightContainerStyle: { paddingRight: 8 },
           headerShown: false,
-          tabBarIcon: ({ focused }) => <UserIcon width={24} height={24} />,
+          tabBarIcon: ({ focused }) => (
+            <UserIcon
+              width={24}
+              height={24}
+              color={focused ? colors.orange : 'black'}
+            />
+          ),
         })}
       />
     </Tab.Navigator>

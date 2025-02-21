@@ -17,66 +17,69 @@ import { StyledButton } from '../Components/StyledButton';
 import * as ImagePicker from 'expo-image-picker';
 import { registerUser } from '../../utils/auth';
 import { useDispatch } from 'react-redux';
+import { REGISTER_INITIAL_STATE } from '../constants/constants';
+import { Avatar } from '../Components/Avatar';
+import { useNavigation } from '@react-navigation/native';
 
-export const RegistrationScreen = ({ navigation }) => {
+export const RegistrationScreen = () => {
   const dispatch = useDispatch();
-  const [photo, setPhoto] = useState('');
-  const [login, setLogin] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const navigation = useNavigation();
+  const [user, setUser] = useState(REGISTER_INITIAL_STATE);
 
-  const handlePhotoUpload = async () => {
-    try {
-      const { status } =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
+  useEffect(() => {
+    checkFormFilled();
+  }, [user.email, user.password, user.login, user.photo]);
+  // useEffect(() => {
+  //   setUser((prev) => ({
+  //     ...prev,
+  //     isFormFilled: Boolean(
+  //       prev.email && prev.password && prev.login && prev.photo
+  //     ),
+  //   }));
+  // }, [user.email, user.password, user.login, user.photo]);
 
-      if (status !== 'granted') {
-        alert('Permission to access media library is required!');
-        return;
-      }
+  const onChangeUserData = (key, value) => {
+    if (key === 'isPasswordHidden')
+      return setUser((prev) => ({ ...prev, [key]: !user.isPasswordHidden }));
 
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: 'images',
-        allowsEditing: false,
-        quality: 1,
-      });
-
-      if (!result.canceled) {
-        setPhoto(result.assets[0].uri);
-      }
-    } catch (error) {
-      console.log('Error while downloading photo', error);
-      alert('Error while downloading photo');
-    }
-  };
-
-  const handlePhotoRemove = () => {
-    setPhoto('');
-  };
-
-  const handleLoginChange = (value) => {
-    setLogin(value);
-  };
-
-  const handleEmailChange = (value) => {
-    setEmail(value);
-  };
-
-  const handlePasswordChange = (value) => {
-    if (value.length < 20) {
-      setPassword(value);
-    }
+    setUser((prev) => ({ ...prev, [key]: value }));
   };
 
   const onPressRegistration = async () => {
-    console.log('Sign up!');
-    registerUser({ email, password });
+    if (!user.isFormFilled) {
+      console.log('❌ Registration blocked: Form is not filled.');
+      return;
+    }
+
+    console.log('🚀 Starting registration with:', user);
+
+    const { email, password, login, photo } = user;
+
+    try {
+      const response = await registerUser(
+        { email, password, login, photo },
+        dispatch
+      );
+      console.log('✅ Registration successful:', response);
+    } catch (error) {
+      console.error('❌ Registration failed:', error);
+    }
   };
 
   const onPressLogin = () => {
-    console.log('Login pressed');
     navigation.navigate('Login');
+  };
+
+  const onPressChangeAvatar = (uri) => {
+    onChangeUserData('photo', uri);
+  };
+
+  const checkFormFilled = () => {
+    if (user.email && user.password && user.login && user.photo)
+      console.log('📝 Form Filled:', isFormFilled);
+    {
+      setUser((prev) => ({ ...prev, isFormFilled: true }));
+    }
   };
 
   return (
@@ -92,26 +95,10 @@ export const RegistrationScreen = ({ navigation }) => {
             style={styles.container}
           >
             <View style={styles.formContainer}>
-              <View style={styles.avatar}>
-                {photo ? (
-                  <>
-                    <Image source={{ uri: photo }} style={styles.photo} />
-                    <StyledButton
-                      buttonStyles={styles.avatarButton}
-                      onPress={handlePhotoRemove}
-                    >
-                      <CircleCrossSvg />
-                    </StyledButton>
-                  </>
-                ) : (
-                  <StyledButton
-                    onPress={handlePhotoUpload}
-                    buttonStyles={styles.avatarButton}
-                  >
-                    <CirclePlusSvg />
-                  </StyledButton>
-                )}
-              </View>
+              <Avatar
+                photo={user.photo}
+                onPressChangeAvatar={onPressChangeAvatar}
+              />
 
               <Text style={styles.title}>Реєстрація</Text>
 
@@ -119,29 +106,32 @@ export const RegistrationScreen = ({ navigation }) => {
                 <TextInput
                   placeholder="Логін"
                   style={styles.input}
-                  value={login}
-                  onChangeText={handleLoginChange}
+                  value={user.login}
+                  onChangeText={(text) => onChangeUserData('login', text)}
                 />
                 <TextInput
                   placeholder="Адреса електронної пошти"
                   style={styles.input}
-                  value={email}
-                  onChangeText={handleEmailChange}
+                  value={user.email}
+                  onChangeText={(text) => onChangeUserData('email', text)}
+                  onBlur={checkFormFilled}
                 />
                 <View style={styles.passwordField}>
                   <TextInput
                     placeholder="Пароль"
                     style={styles.input}
-                    secureTextEntry={!isPasswordVisible}
-                    value={password}
-                    onChangeText={handlePasswordChange}
+                    secureTextEntry={user.isPasswordHidden}
+                    outerStyles={styles.passwordInput}
+                    value={user.password}
+                    onBlur={checkFormFilled}
+                    onChangeText={(text) => onChangeUserData('password', text)}
                   />
                   <StyledButton
-                    onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+                    onPress={() => onChangeUserData('isPasswordHidden')}
                     buttonStyles={styles.passwordButton}
                   >
                     <Text style={styles.passwordButtonText}>
-                      {isPasswordVisible ? 'Приховати' : 'Показати'}
+                      {user.isPasswordHidden ? 'Показати' : 'Приховати'}
                     </Text>
                   </StyledButton>
                 </View>
@@ -150,6 +140,7 @@ export const RegistrationScreen = ({ navigation }) => {
               <StyledButton
                 buttonStyles={styles.mainActionButton}
                 onPress={onPressRegistration}
+                disabled={!user.isFormFilled}
               >
                 <Text style={styles.mainActionButtonText}>Зареєструватися</Text>
               </StyledButton>
@@ -170,3 +161,56 @@ export const RegistrationScreen = ({ navigation }) => {
     </>
   );
 };
+
+// const handlePhotoUpload = async () => {
+//   try {
+//     const { status } =
+//       await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+//     if (status !== 'granted') {
+//       alert('Permission to access media library is required!');
+//       return;
+//     }
+
+//     const result = await ImagePicker.launchImageLibraryAsync({
+//       mediaTypes: 'images',
+//       allowsEditing: false,
+//       quality: 1,
+//     });
+
+//     if (!result.canceled) {
+//       setPhoto(result.assets[0].uri);
+//     }
+//   } catch (error) {
+//     console.log('Error while downloading photo', error);
+//     alert('Error while downloading photo');
+//   }
+// };
+
+// const handlePhotoRemove = () => {
+//   setPhoto('');
+// };
+
+// const handleLoginChange = (value) => {
+//   setLogin(value);
+// };
+
+// const handleEmailChange = (value) => {
+//   setEmail(value);
+// };
+
+// const handlePasswordChange = (value) => {
+//   if (value.length < 20) {
+//     setPassword(value);
+//   }
+// };
+
+// const onPressRegistration = async () => {
+//   console.log('Sign up!');
+//   registerUser({ email, password });
+// };
+
+// const onPressLogin = () => {
+//   console.log('Login pressed');
+//   navigation.navigate('Login');
+// };
