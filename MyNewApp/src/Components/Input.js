@@ -3,65 +3,62 @@ import { StyleSheet, TextInput, View } from 'react-native';
 import { colors } from '../../styles/globalStyles';
 
 export const Input = ({
-  value,
-  onTextChange,
   placeholder,
+  value,
+  onChange,
+  secure = false,
   outerStyles,
-  rightButton,
-  autofocus = false,
-  secureTextEntry = false,
-  onBlur: onBlurCustom,
+  icon,
+  children,
+  onBlurInput,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
 
-  const onFocus = () => {
-    setIsFocused(true);
-  };
-
+  const onFocus = () => setIsFocused(true);
   const onBlur = () => {
+    onBlurInput && onBlurInput();
     setIsFocused(false);
-
-    if (onBlurCustom) {
-      onBlurCustom();
-    }
   };
 
   return (
-    <View style={[styles.input, isFocused && styles.focused, outerStyles]}>
+    <View styles={styles.wrapper}>
       <TextInput
+        style={[styles.input, isFocused && styles.focused, outerStyles]}
+        onChangeText={onChange}
         value={value}
-        autoFocus={autofocus}
-        onChangeText={onTextChange}
         placeholder={placeholder}
-        secureTextEntry={secureTextEntry}
-        style={styles.baseText}
-        autoCapitalize="none"
         onFocus={onFocus}
         onBlur={onBlur}
-      />
-
-      {rightButton}
+        secureTextEntry={secure}
+      >
+        {children}
+      </TextInput>
+      <View style={styles.icon}>{icon}</View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   input: {
-    padding: 16,
     height: 50,
-    borderRadius: 16,
     borderWidth: 1,
-    borderColor: colors.border_gray,
+    padding: 16,
     backgroundColor: colors.light_gray,
-  },
-  baseText: {
-    fontWeight: '400',
+    borderColor: colors.gray,
+    borderRadius: 8,
+    fontFamily: 'Roboto-Regular',
     fontSize: 16,
-    lineHeight: 18,
-    color: colors.black_primary,
+    lineHeight: 19,
+    fontWeight: '400',
   },
   focused: {
     backgroundColor: colors.white,
     borderColor: colors.orange,
+    color: colors.black,
+  },
+  icon: {
+    position: 'absolute',
+    left: 0,
+    top: 10,
   },
 });

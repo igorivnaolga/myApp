@@ -1,10 +1,13 @@
 import { FC, useEffect, useState, useRef } from 'react';
 import {
   Image,
+  Keyboard,
   KeyboardAvoidingView,
+  Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from 'react-native';
 
@@ -22,216 +25,235 @@ import { StyledButton } from '../Components/StyledButton';
 import { Input } from '../Components/Input';
 import { addPost, uploadImage } from '../../utils/firestore';
 import { nanoid } from '@reduxjs/toolkit';
+import { POST_INITIAL_STATE } from '../constants/constants';
+import { selectInfo } from '../redux/reducers/userSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { DownloadImage } from '../Components/DownloadImage';
+import { FlatList, ScrollView } from 'react-native-gesture-handler';
+import Camera from '../Components/Camera';
 
 const PLACES_KEY = 'AIzaSyA-uCvWguBzl0M97bS7rRUMikXj_YEJxts';
 
-export const CreatePostsScreen = ({ navigation, route }) => {
-  const params = route?.params;
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [uploadedImage, setUploadedImage] = useState(null);
-  const [title, setTitle] = useState('');
-  const [address, setAddress] = useState('');
-  const [status, requestPermission] = ImagePicker.useCameraPermissions();
+export const CreatePostsScreen = () => {
+  const [post, setPost] = useState(POST_INITIAL_STATE);
+  const user = useSelector(selectInfo);
+  const dispatch = useDispatch();
   const autocompleteRef = useRef(null);
-  // const user = useSelector((state) => state.user.userInfo);
+  const [showCamera, setShowCamera] = useState(true);
 
+  const route = useRoute();
+
+  // Update state if a photo is passed via route params
+  useEffect(() => {
+    if (route.params?.photo) {
+      onChangePostData('image', route.params.photo);
+    }
+  }, [route.params]);
+
+  const navigation = useNavigation();
   const navigateToCameraScreen = async () => {
     navigation.navigate('Camera');
   };
 
-  const pickImage = async () => {
-    const permissionResult =
-      await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-    if (!permissionResult.granted) {
-      alert('Permission to access media library is required!');
-      return;
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: 'images',
-      allowsEditing: false,
-      quality: 0.3,
-    });
-
-    if (!result.canceled) {
-      const { uri } = result.assets[0];
-
-      setSelectedImage(uri);
-    }
+  const onChangePostData = (key, value) => {
+    console.log(`Updating ${key} with value:`, value);
+    setPost((prev) => ({ ...prev, [key]: value }));
   };
 
-  const uploadImageToStorage = async () => {
-    if (!selectedImage) return;
-
-    try {
-      const response = await fetch(selectedImage);
-      const file = await response.blob();
-      const fileName = selectedImage.split('/').pop(); // Отримуємо ім'я файлу з URI
-      const fileType = file.type; // Отримуємо тип файлу
-      const imageFile = new File([file], fileName, { type: fileType });
-
-      const uploadedImageUrl = await uploadImage(user.uid, imageFile, fileName);
-
-      return uploadedImageUrl;
-    } catch (e) {
-      console.log(e);
-      return null;
+  const checkForm = () => {
+    if (post.image && post.title && post.location) {
+      setPost((prev) => ({ ...prev, isEmptyPost: false }));
     }
   };
 
   const onClearData = () => {
-    setSelectedImage('');
-    setUploadedImage('');
-    setTitle('');
-    setAddress('');
-    autocompleteRef?.current?.setAddressText('');
+    setPost(POST_INITIAL_STATE);
+    setShowCamera(true);
   };
 
-  useEffect(() => {
-    if (!params?.photo) return;
+  // const onPressPublicationButton = async () => {
+  //   if (post.isEmptyPost) return;
 
-    setSelectedImage(params.photo);
-  }, [params]);
+  //   let { status } = await Location.requestForegroundPermissionsAsync();
+  //   if (status !== 'granted') {
+  //     Alert.alert('Permission to access location was denied');
+  //     return;
+  //   }
 
-  const onPublish = async () => {
-    if (!user) return;
+  //   let location = await Location.getCurrentPositionAsync({});
 
-    try {
-      const imageUrl = await uploadImageToStorage();
-      const postId = nanoid();
+  //   const data = {
+  //     ...post,
+  //     coords: {
+  //       latitude: location.coords.latitude,
+  //       longitude: location.coords.longitude,
+  //     },
+  //     userId: user.uid,
+  //   };
 
-      await addPost(postId, {
-        address,
-        id: postId,
-        image: imageUrl,
-        userId: user.uid,
-        title,
-        comments: [],
-      });
+  //   dispatch(addPost(data));
 
-      Alert.alert('Пост успішно створено!');
-      onClearData();
-    } catch (error) {
-      console.log(error);
+  //   onClearData();
+  //   navigation.navigate('Posts');
+  // };
+
+  const onPressPublicationButton = async () => {
+    // Check if any required field is empty
+    if (!post.image.trim() || !post.title.trim()) {
+      console.log('Post is incomplete.');
+      return;
     }
+
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission to access location was denied');
+      return;
+    }
+
+    let location = await Location.getCurrentPositionAsync({});
+
+    const data = {
+      ...post,
+      coords: {
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      },
+      userId: user.uid,
+    };
+
+    dispatch(addPost(data));
+    onClearData();
+    navigation.navigate('Posts');
   };
-  const isDisabled = !title || !address || !selectedImage;
+
+  const takePhoto = (imageURI) => {
+    if (showCamera) {
+      setShowCamera(false);
+    }
+    onChangePostData('image', imageURI);
+  };
+  useEffect(() => {
+    console.log('📝 Current Post State:', post);
+  }, [post]);
 
   return (
-    <View style={styles.section}>
-      <View style={styles.imageContainer}>
-        <View style={styles.emptyImgContainer}>
-          {!selectedImage ? (
-            <CameraIcon style={styles.camera} onPress={navigateToCameraScreen}>
-              <View style={styles.cameraContent}>
-                <TouchableOpacity style={styles.cameraIconWrapper}>
-                  <CameraIcon width={24} height={24} />
-                </TouchableOpacity>
-              </View>
-            </CameraIcon>
-          ) : (
-            <>
-              <Image source={{ uri: selectedImage }} style={styles.image} />
-              <TouchableOpacity
-                style={styles.cameraIconWrapper}
-                onPress={() => setSelectedImage(null)}
-              >
-                <CameraIcon width={24} height={24} />
-              </TouchableOpacity>
-            </>
-          )}
-        </View>
-
-        <TouchableOpacity onPress={pickImage}>
-          <Text style={[styles.btnText, styles.grayText]}>
-            {selectedImage ? 'Редагувати фото' : 'Завантажте фото'}
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={{ flex: 1 }}>
-        <KeyboardAvoidingView style={{ flex: 1 }}>
-          <Input
-            value={title}
-            placeholder="Назва..."
-            outerStyles={styles.input}
-            onTextChange={setTitle}
-          />
-
-          <View style={styles.locationInputContainer}>
-            <MapMarkerGray width={24} height={24} style={styles.mapMarker} />
-            <GooglePlacesAutocomplete
-              ref={autocompleteRef}
-              placeholder="Місцевість..."
-              minLength={4}
-              enablePoweredByContainer={false}
-              fetchDetails
-              onPress={(data, details = null) => {
-                setAddress(data.description);
-              }}
-              query={{ key: PLACES_KEY }}
-              styles={{
-                container: {
-                  flex: 1,
-                },
-                textInputContainer: {
-                  flexDirection: 'row',
-                  paddingHorizontal: 0,
-                },
-                textInput: {
-                  paddingVertical: 5,
-                  paddingHorizontal: 28,
-                  fontSize: 15,
-                  flex: 1,
-                  borderBottomWidth: 1,
-                  borderColor: colors.border_gray,
-                },
-                row: {
-                  backgroundColor: '#FFFFFF',
-                  padding: 13,
-                  height: 44,
-                  flexDirection: 'row',
-                },
-                predefinedPlacesDescription: {
-                  color: '#1faadb',
-                },
-                listView: {
-                  maxHeight: 160,
-                },
-              }}
-            />
-          </View>
-        </KeyboardAvoidingView>
-
-        <StyledButton
-          onPress={onPublish}
-          isDisabled={isDisabled}
-          buttonStyles={[isDisabled && styles.disabledButton]}
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={styles.section}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.section}
         >
-          <Text
+          <View style={styles.imageContainer}>
+            <View style={styles.emptyImgContainer}>
+              <Camera
+                onPressTakePicture={takePhoto}
+                image={post.image}
+                showCamera={showCamera}
+              />
+
+              <DownloadImage
+                onPressDownload={takePhoto}
+                outerButtonStyles={styles.downloadButton}
+              >
+                <Text style={styles.imageText}>
+                  {showCamera ? 'Завантажте фото' : 'Редагувати фото'}
+                </Text>
+              </DownloadImage>
+            </View>
+          </View>
+
+          <View style={{ flex: 1 }}>
+            <KeyboardAvoidingView style={{ flex: 1 }}>
+              <Input
+                value={post.title}
+                placeholder="Назва..."
+                outerStyles={styles.input}
+                onChange={(text) => onChangePostData('title', text)}
+                onBlurInput={checkForm}
+              />
+
+              <View style={styles.locationInputContainer}>
+                <MapMarkerGray
+                  width={24}
+                  height={24}
+                  style={styles.mapMarker}
+                />
+                <GooglePlacesAutocomplete
+                  ref={autocompleteRef}
+                  placeholder="Місцевість..."
+                  value={post.location}
+                  minLength={4}
+                  enablePoweredByContainer={false}
+                  fetchDetails
+                  onPress={(text) => onChangePostData('location', text)}
+                  query={{ key: PLACES_KEY }}
+                  onBlur={checkForm}
+                  styles={{
+                    container: {
+                      flex: 1,
+                    },
+                    textInputContainer: {
+                      flexDirection: 'row',
+                      paddingHorizontal: 0,
+                    },
+                    textInput: {
+                      paddingVertical: 5,
+                      paddingHorizontal: 28,
+                      fontSize: 15,
+                      flex: 1,
+                      borderBottomWidth: 1,
+                      borderColor: colors.border_gray,
+                    },
+                    row: {
+                      backgroundColor: '#FFFFFF',
+                      padding: 13,
+                      height: 44,
+                      flexDirection: 'row',
+                    },
+                    predefinedPlacesDescription: {
+                      color: '#1faadb',
+                    },
+                    listView: {
+                      maxHeight: 160,
+                    },
+                  }}
+                />
+              </View>
+            </KeyboardAvoidingView>
+
+            <StyledButton
+              onPress={onPressPublicationButton}
+              buttonStyles={[
+                styles.publicationButton,
+                !post.isEmptyPost && styles.publicationButtonActive,
+              ]}
+            >
+              <Text
+                style={[
+                  styles.publicationText,
+                  !post.isEmptyPost && styles.publicationTextActive,
+                ]}
+              >
+                Опублікувати
+              </Text>
+            </StyledButton>
+          </View>
+
+          <View
             style={{
-              ...styles.btnText,
-              ...(isDisabled ? styles.unactiveBtnText : null),
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              alignItems: 'center',
             }}
           >
-            Опублікувати
-          </Text>
-        </StyledButton>
+            <StyledButton buttonStyles={styles.deleteBtn} onPress={onClearData}>
+              <TrashCan width={24} height={24} />
+            </StyledButton>
+          </View>
+        </KeyboardAvoidingView>
       </View>
-
-      <View
-        style={{
-          flexDirection: 'column',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}
-      >
-        <StyledButton buttonStyles={styles.deleteBtn} onPress={onClearData}>
-          <TrashCan width={24} height={24} />
-        </StyledButton>
-      </View>
-    </View>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -250,12 +272,23 @@ const styles = StyleSheet.create({
     color: colors.white,
     textAlign: 'center',
   },
-  unactiveBtnText: {
-    color: colors.text_gray,
-  },
-  disabledButton: {
+  publicationButton: {
     backgroundColor: colors.light_gray,
   },
+  publicationButtonActive: {
+    backgroundColor: colors.orange,
+  },
+  publicationText: {
+    color: colors.dark_gray,
+    fontFamily: 'Roboto-Regular',
+    fontSize: 16,
+    fontWeight: 500,
+    lineHeight: 19,
+  },
+  publicationTextActive: {
+    color: colors.white,
+  },
+
   grayText: {
     textAlign: 'left',
     color: colors.text_gray,
@@ -334,4 +367,109 @@ const styles = StyleSheet.create({
     left: 0,
     zIndex: 1000,
   },
+  downloadButton: {
+    paddingVertical: 0,
+    paddingHorizontal: 0,
+    backgroundColor: 'transparent',
+    alignItems: 'flex-start',
+  },
+  imageText: {
+    color: colors.dark_gray,
+    fontFamily: 'Roboto-Regular',
+    fontSize: 16,
+    fontWeight: 400,
+  },
 });
+
+//export const CreatePostsScreen = ({ navigation, route }) => {
+//   const params = route?.params;
+//   const [selectedImage, setSelectedImage] = useState(null);
+//   const [uploadedImage, setUploadedImage] = useState(null);
+//   const [title, setTitle] = useState('');
+//   const [address, setAddress] = useState('');
+//   const [status, requestPermission] = ImagePicker.useCameraPermissions();
+//   const autocompleteRef = useRef(null);
+//   // const user = useSelector((state) => state.user.userInfo);
+
+//   const navigateToCameraScreen = async () => {
+//     navigation.navigate('Camera');
+//   };
+
+//   const pickImage = async () => {
+//     const permissionResult =
+//       await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+//     if (!permissionResult.granted) {
+//       alert('Permission to access media library is required!');
+//       return;
+//     }
+
+//     const result = await ImagePicker.launchImageLibraryAsync({
+//       mediaTypes: 'images',
+//       allowsEditing: false,
+//       quality: 0.3,
+//     });
+
+//     if (!result.canceled) {
+//       const { uri } = result.assets[0];
+
+//       setSelectedImage(uri);
+//     }
+//   };
+
+//   const uploadImageToStorage = async () => {
+//     if (!selectedImage) return;
+
+//     try {
+//       const response = await fetch(selectedImage);
+//       const file = await response.blob();
+//       const fileName = selectedImage.split('/').pop(); // Отримуємо ім'я файлу з URI
+//       const fileType = file.type; // Отримуємо тип файлу
+//       const imageFile = new File([file], fileName, { type: fileType });
+
+//       const uploadedImageUrl = await uploadImage(user.uid, imageFile, fileName);
+
+//       return uploadedImageUrl;
+//     } catch (e) {
+//       console.log(e);
+//       return null;
+//     }
+//   };
+
+//   const onClearData = () => {
+//     setSelectedImage('');
+//     setUploadedImage('');
+//     setTitle('');
+//     setAddress('');
+//     autocompleteRef?.current?.setAddressText('');
+//   };
+
+//   useEffect(() => {
+//     if (!params?.photo) return;
+
+//     setSelectedImage(params.photo);
+//   }, [params]);
+
+//   const onPublish = async () => {
+//     if (!user) return;
+
+//     try {
+//       const imageUrl = await uploadImageToStorage();
+//       const postId = nanoid();
+
+//       await addPost(postId, {
+//         address,
+//         id: postId,
+//         image: imageUrl,
+//         userId: user.uid,
+//         title,
+//         comments: [],
+//       });
+
+//       Alert.alert('Пост успішно створено!');
+//       onClearData();
+//     } catch (error) {
+//       console.log(error);
+//     }
+//   };
+//   const isDisabled = !title || !address || !selectedImage;
