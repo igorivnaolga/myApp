@@ -3,47 +3,80 @@ import { colors } from '../../styles/globalStyles';
 import { Message } from '../../icons/Message';
 import { ThumbUp } from '../../icons/ThumbUp';
 import { MapMarkerGray } from '../../icons/MapMarkerGray';
-import { TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { StyledButton } from '../Components/StyledButton';
 
-export const Post = ({
-  image,
-  title,
-  location,
-  onLocationPress = () => {},
-  onCommentsPress = () => {},
-}) => {
-  const truncatedLocation =
-    location?.length > 30 ? location.substring(0, 27) + '...' : location;
+export const Post = ({ post }) => {
+  const navigation = useNavigation();
 
+  const onCommentsPress = () =>
+    navigation.navigate('Comments', {
+      postId: post.id,
+    });
+  const onLocationPress = () => navigation.navigate('Map', { postId: post.id });
+
+  const location = post.location.at(0).toUpperCase() + post.location.slice(1);
+
+  const ImageWrapper = ({ uri }) => {
+    return (
+      <View style={styles.imageWrapper}>
+        <Image
+          source={!!uri ? { uri } : require('../../images/Post1.jpg')}
+          style={styles.image}
+        />
+      </View>
+    );
+  };
   return (
     <View style={styles.container}>
-      <Image source={image} style={styles.image} />
-      <Text style={styles.title}>{title}</Text>
-      <View style={styles.locationContainer}>
-        <View style={styles.btnsContainer}>
-          <TouchableOpacity
-            style={styles.commentsContainer}
-            onPress={onCommentsPress}
-          >
-            <View style={styles.commentsContainer}>
-              <Message width={24} height={24} />
-              <Text style={styles.comments}>0</Text>
+      <ImageWrapper uri={post.image} />
+
+      <Text style={styles.title}>{post.title}</Text>
+      <View style={styles.infoContainer}>
+        <View style={styles.infoThumb}>
+          <StyledButton buttonStyles={styles.button} onPress={onCommentsPress}>
+            <View style={styles.infoWrapper}>
+              <Message
+                color={
+                  post.comments.length === 0 ? colors.dark_gray : colors.orange
+                }
+                filled={post.comments.length !== 0}
+              />
+              <Text
+                style={[
+                  styles.comments,
+                  post.info === 0 && styles.infoNonActive,
+                ]}
+              >
+                {post.comments.length}
+              </Text>
             </View>
-          </TouchableOpacity>
-          <View style={styles.commentsContainer}>
-            <ThumbUp width={24} height={24} />
-            <Text style={styles.comments}>0</Text>
-          </View>
+          </StyledButton>
+
+          {post.likes !== undefined && (
+            <View style={styles.infoWrapper}>
+              <ThumbUp
+                color={post.likes === 0 ? colors.dark_gray : colors.orange}
+              />
+              <Text
+                style={[styles.likes, post.info === 0 && styles.infoNonActive]}
+              >
+                {post.likes}
+              </Text>
+            </View>
+          )}
         </View>
-        <TouchableOpacity
-          style={styles.locationContainer}
-          onPress={onLocationPress}
-        >
-          <View style={styles.locationContainer}>
-            <MapMarkerGray width={24} height={24} />
-            <Text style={styles.location}>{truncatedLocation}</Text>
+
+        <StyledButton buttonStyles={styles.button} onPress={onLocationPress}>
+          <View style={styles.infoWrapper}>
+            <MapMarkerGray color={colors.dark_gray} />
+            <Text
+              style={[styles.comments, post.info === 0 && styles.infoNonActive]}
+            >
+              {location}
+            </Text>
           </View>
-        </TouchableOpacity>
+        </StyledButton>
       </View>
     </View>
   );
@@ -51,43 +84,49 @@ export const Post = ({
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+    backgroundColor: colors.white,
     gap: 8,
-    marginBottom: 32,
+    paddingVertical: 16,
   },
-  commentsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  image: {
-    width: '100%',
-    height: 240,
-    borderRadius: 8,
-  },
+
   title: {
+    color: colors.black,
     fontFamily: 'Roboto-Medium',
     fontSize: 16,
-    color: colors.black_primary,
+    fontWeight: 500,
   },
-  btnsContainer: {
-    flexDirection: 'row',
-    gap: 24,
-  },
-  locationContainer: {
+  infoContainer: {
+    flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
+  },
+  infoThumb: {
+    flex: 1,
+    flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    justifyContent: 'flex-start',
+    gap: 24,
   },
-  location: {
+  infoWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+  },
+  info: {
+    color: colors.black,
     fontFamily: 'Roboto-Regular',
     fontSize: 16,
-    textDecorationLine: 'underline',
-    color: colors.black_primary,
+    fontWeight: 400,
+    lineHeight: 19,
   },
-  comments: {
-    fontFamily: 'Roboto-Regular',
-    fontSize: 16,
-    color: colors.text_gray,
+  infoNonActive: {
+    color: colors.dark_gray,
+  },
+  button: {
+    backgroundColor: 'transparent',
+    paddingVertical: 0,
+    paddingHorizontal: 0,
   },
 });

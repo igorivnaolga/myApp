@@ -6,16 +6,13 @@ import {
   Platform,
   StyleSheet,
   Text,
-  TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
 
 import { TrashCan } from '../../icons/TrashCan';
-import { CameraIcon } from '../../icons/CameraIcon';
 import 'react-native-get-random-values';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
-import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
 import { MapMarkerGray } from '../../icons/MapMarkerGray';
 
@@ -24,13 +21,11 @@ import { colors } from '../../styles/globalStyles';
 import { StyledButton } from '../Components/StyledButton';
 import { Input } from '../Components/Input';
 import { addPost, uploadImage } from '../../utils/firestore';
-import { nanoid } from '@reduxjs/toolkit';
 import { POST_INITIAL_STATE } from '../constants/constants';
 import { selectInfo } from '../redux/reducers/userSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { DownloadImage } from '../Components/DownloadImage';
-import { FlatList, ScrollView } from 'react-native-gesture-handler';
 import Camera from '../Components/Camera';
 
 const PLACES_KEY = 'AIzaSyA-uCvWguBzl0M97bS7rRUMikXj_YEJxts';
@@ -328,7 +323,7 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: colors.white,
+    // backgroundColor: colors.white,
     alignItems: 'center',
     justifyContent: 'center',
   },
