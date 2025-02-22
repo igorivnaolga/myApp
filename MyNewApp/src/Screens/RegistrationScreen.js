@@ -75,11 +75,12 @@ export const RegistrationScreen = () => {
   };
 
   const checkFormFilled = () => {
-    if (user.email && user.password && user.login && user.photo)
-      console.log('📝 Form Filled:', isFormFilled);
-    {
-      setUser((prev) => ({ ...prev, isFormFilled: true }));
-    }
+    setUser((prev) => ({
+      ...prev,
+      isFormFilled: Boolean(
+        prev.email && prev.password && prev.login && prev.photo
+      ),
+    }));
   };
 
   return (

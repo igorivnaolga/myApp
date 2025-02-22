@@ -4,6 +4,7 @@
     "slug": "MyNewApp",
     "version": "1.0.0",
     "platforms": ["ios", "android", "web"],
+    "newArchEnabled": true,
     "android": {
       "config": {
         "googleMaps": {

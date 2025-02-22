@@ -89,8 +89,8 @@ export const LoginScreen = () => {
               <StyledButton
                 buttonStyles={styles.mainActionButton}
                 onPress={onPressLogin}
-              >
                 disabled={!user.isFormFilled}
+              >
                 <Text style={styles.mainActionButtonText}>Увійти</Text>
               </StyledButton>
 

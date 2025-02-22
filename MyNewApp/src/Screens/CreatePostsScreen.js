@@ -56,13 +56,28 @@ export const CreatePostsScreen = () => {
     navigation.navigate('Camera');
   };
 
+  // const onChangePostData = (key, value) => {
+  //   console.log(`Updating ${key} with value:`, value);
+  //   setPost((prev) => ({ ...prev, [key]: value }));
+  // };
+
   const onChangePostData = (key, value) => {
     console.log(`Updating ${key} with value:`, value);
+
+    if (key === 'location' && typeof value === 'object' && value.description) {
+      value = value.description; // Extract only the location name
+    }
+
     setPost((prev) => ({ ...prev, [key]: value }));
   };
 
   const checkForm = () => {
-    if (post.image && post.title && post.location) {
+    if (
+      post.image &&
+      post.title &&
+      typeof post.location === 'string' &&
+      post.location.trim()
+    ) {
       setPost((prev) => ({ ...prev, isEmptyPost: false }));
     }
   };
@@ -186,7 +201,9 @@ export const CreatePostsScreen = () => {
                   minLength={4}
                   enablePoweredByContainer={false}
                   fetchDetails
-                  onPress={(text) => onChangePostData('location', text)}
+                  onPress={(data, details = null) =>
+                    onChangePostData('location', data)
+                  }
                   query={{ key: PLACES_KEY }}
                   onBlur={checkForm}
                   styles={{
