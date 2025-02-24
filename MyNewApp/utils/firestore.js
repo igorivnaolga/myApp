@@ -24,9 +24,11 @@ export const addUser = async (userId, userData) => {
 
 export const addPostService = async (post) => {
   try {
+    console.log('📤 Saving post:', post);
     const postRef = await addDoc(collection(db, 'posts'), {
       ...post,
     });
+    console.log('✅ Post saved with ID:', postRef.id);
 
     const postImage = await uploadImage(
       post.userID,
@@ -34,6 +36,7 @@ export const addPostService = async (post) => {
       postRef.id,
       'postsPhotos'
     );
+    console.log('📷 Image uploaded:', postImageURL);
 
     await updateDoc(postRef, {
       image: postImage,
@@ -47,6 +50,7 @@ export const addPostService = async (post) => {
 
       return post;
     } else {
+      console.error('❌ Error adding post:', error);
       throw new Error('Error adding post');
     }
   } catch (error) {

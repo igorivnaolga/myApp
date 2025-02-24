@@ -30,7 +30,7 @@ export const DownloadImage = ({
 
     if (!result.canceled) {
       const uri = result.assets[0].uri;
-
+      console.log('Selected Image URI:', uri);
       onPressDownload(uri);
     }
   };

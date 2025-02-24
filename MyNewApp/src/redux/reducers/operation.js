@@ -31,7 +31,7 @@ export const addPost = createAsyncThunk(
 
       return response;
     } catch (error) {
-      thunkAPI.rejectWithValue(error.message);
+      return thunkAPI.rejectWithValue(error.message);
     }
   }
 );

@@ -47,6 +47,7 @@ export const CreatePostsScreen = () => {
   }, [route.params]);
 
   const navigation = useNavigation();
+  console.log('🔍 Navigation object:', navigation);
   const navigateToCameraScreen = async () => {
     navigation.navigate('Camera');
   };
@@ -110,6 +111,13 @@ export const CreatePostsScreen = () => {
 
   const onPressPublicationButton = async () => {
     // Check if any required field is empty
+    console.log('🟢 Button pressed, starting post...');
+    console.log('🔍 Checking user before post:', user);
+    console.log('📤 Posting data...');
+    if (!user || !user.uid) {
+      console.error('🚨 Error: User ID is missing');
+      return;
+    }
     if (!post.image.trim() || !post.title.trim()) {
       console.log('Post is incomplete.');
       return;
@@ -131,10 +139,10 @@ export const CreatePostsScreen = () => {
       },
       userId: user.uid,
     };
-
+    console.log('🚀 Posting data:', data);
     dispatch(addPost(data));
     onClearData();
-    navigation.navigate('Posts');
+    navigation.navigate('PostsScreen');
   };
 
   const takePhoto = (imageURI) => {

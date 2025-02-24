@@ -10,6 +10,7 @@ import { selectInfo } from '../redux/reducers/userSlice';
 import { BottomTabNavigator } from '../navigation/BottomTabNavigator';
 import { colors } from '../../styles/globalStyles';
 import { CreatePostsScreen } from '../Screens/CreatePostsScreen';
+import { PostsScreen } from '../Screens/PostsScreen';
 
 const Stack = createStackNavigator();
 
@@ -23,6 +24,7 @@ export const MainNavigator = () => {
       {user ? (
         <>
           <Stack.Screen name="Home" component={BottomTabNavigator} />
+          <Stack.Screen name="PostsScreen" component={PostsScreen} />
           <Stack.Screen name="Camera" component={CameraScreen} />
           <Stack.Screen
             name="Map"

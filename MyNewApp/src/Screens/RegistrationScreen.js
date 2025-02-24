@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Image,
   ImageBackground,
   Keyboard,
   KeyboardAvoidingView,
@@ -11,10 +10,7 @@ import {
   View,
 } from 'react-native';
 import { styles } from '../../styles/styles';
-import { CirclePlusSvg } from '../../icons/CirclePlusSvg';
-import { CircleCrossSvg } from '../../icons/CircleCrossSvg';
 import { StyledButton } from '../Components/StyledButton';
-import * as ImagePicker from 'expo-image-picker';
 import { registerUser } from '../../utils/auth';
 import { useDispatch } from 'react-redux';
 import { REGISTER_INITIAL_STATE } from '../constants/constants';
@@ -71,6 +67,7 @@ export const RegistrationScreen = () => {
   };
 
   const onPressChangeAvatar = (uri) => {
+    console.log('Updating avatar with URI:', uri);
     onChangeUserData('photo', uri);
   };
 

@@ -12,7 +12,7 @@ const firebaseConfig = {
   apiKey: process.env.EXPO_PUBLIC_FIREBASE_API,
   authDomain: 'mynewproject-1805b.firebaseapp.com',
   projectId: 'mynewproject-1805b',
-  storageBucket: 'mynewproject-1805b.appspot.com',
+  storageBucket: 'mynewproject-1805b.firebasestorage.app',
 };
 
 const app = initializeApp(firebaseConfig);
