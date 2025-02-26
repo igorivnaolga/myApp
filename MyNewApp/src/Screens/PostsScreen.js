@@ -24,8 +24,18 @@ export const PostsScreen = () => {
   const preparedPosts = prepareData(posts);
 
   useEffect(() => {
-    dispatch(fetchPosts(user.uid));
-  }, [dispatch]);
+    if (user && user.uid) {
+      dispatch(fetchPosts(user.uid));
+    }
+  }, [dispatch, user]);
+
+  if (!user) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
 
   return (
     <ScrollView>

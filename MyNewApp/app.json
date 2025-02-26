@@ -3,7 +3,11 @@
     "name": "MyNewApp",
     "slug": "MyNewApp",
     "version": "1.0.0",
-    "platforms": ["ios", "android", "web"],
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
     "newArchEnabled": true,
     "android": {
       "config": {
@@ -12,6 +16,11 @@
         }
       },
       "package": "com.anonymous.MyNewApp"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "1ed5b33b-8f0c-4657-8841-ccb7d6685ee8"
+      }
     }
   }
 }

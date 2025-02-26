@@ -23,9 +23,8 @@ const store = configureStore({
   reducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: {
-        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-      },
+      immutableCheck: false, // Disable immutable state check
+      serializableCheck: false, // Disable serializable state check
     }),
 });
 

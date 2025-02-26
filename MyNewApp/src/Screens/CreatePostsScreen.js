@@ -32,19 +32,10 @@ const PLACES_KEY = 'AIzaSyA-uCvWguBzl0M97bS7rRUMikXj_YEJxts';
 
 export const CreatePostsScreen = () => {
   const [post, setPost] = useState(POST_INITIAL_STATE);
+  const [showCamera, setShowCamera] = useState(true);
   const user = useSelector(selectInfo);
   const dispatch = useDispatch();
   const autocompleteRef = useRef(null);
-  const [showCamera, setShowCamera] = useState(true);
-
-  const route = useRoute();
-
-  // Update state if a photo is passed via route params
-  useEffect(() => {
-    if (route.params?.photo) {
-      onChangePostData('image', route.params.photo);
-    }
-  }, [route.params]);
 
   const navigation = useNavigation();
   console.log('🔍 Navigation object:', navigation);
@@ -58,22 +49,17 @@ export const CreatePostsScreen = () => {
   // };
 
   const onChangePostData = (key, value) => {
-    console.log(`Updating ${key} with value:`, value);
+    if (key === 'image') {
+      setPost((prev) => ({ ...prev, [key]: value, isEmptyPost: false }));
 
-    if (key === 'location' && typeof value === 'object' && value.description) {
-      value = value.description; // Extract only the location name
+      return;
     }
 
     setPost((prev) => ({ ...prev, [key]: value }));
   };
 
   const checkForm = () => {
-    if (
-      post.image &&
-      post.title &&
-      typeof post.location === 'string' &&
-      post.location.trim()
-    ) {
+    if (post.image && post.title && post.location) {
       setPost((prev) => ({ ...prev, isEmptyPost: false }));
     }
   };
@@ -82,32 +68,6 @@ export const CreatePostsScreen = () => {
     setPost(POST_INITIAL_STATE);
     setShowCamera(true);
   };
-
-  // const onPressPublicationButton = async () => {
-  //   if (post.isEmptyPost) return;
-
-  //   let { status } = await Location.requestForegroundPermissionsAsync();
-  //   if (status !== 'granted') {
-  //     Alert.alert('Permission to access location was denied');
-  //     return;
-  //   }
-
-  //   let location = await Location.getCurrentPositionAsync({});
-
-  //   const data = {
-  //     ...post,
-  //     coords: {
-  //       latitude: location.coords.latitude,
-  //       longitude: location.coords.longitude,
-  //     },
-  //     userId: user.uid,
-  //   };
-
-  //   dispatch(addPost(data));
-
-  //   onClearData();
-  //   navigation.navigate('Posts');
-  // };
 
   const onPressPublicationButton = async () => {
     // Check if any required field is empty
@@ -151,9 +111,6 @@ export const CreatePostsScreen = () => {
     }
     onChangePostData('image', imageURI);
   };
-  useEffect(() => {
-    console.log('📝 Current Post State:', post);
-  }, [post]);
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -331,7 +288,6 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    // backgroundColor: colors.white,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -400,96 +356,3 @@ const styles = StyleSheet.create({
     fontWeight: 400,
   },
 });
-
-//export const CreatePostsScreen = ({ navigation, route }) => {
-//   const params = route?.params;
-//   const [selectedImage, setSelectedImage] = useState(null);
-//   const [uploadedImage, setUploadedImage] = useState(null);
-//   const [title, setTitle] = useState('');
-//   const [address, setAddress] = useState('');
-//   const [status, requestPermission] = ImagePicker.useCameraPermissions();
-//   const autocompleteRef = useRef(null);
-//   // const user = useSelector((state) => state.user.userInfo);
-
-//   const navigateToCameraScreen = async () => {
-//     navigation.navigate('Camera');
-//   };
-
-//   const pickImage = async () => {
-//     const permissionResult =
-//       await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-//     if (!permissionResult.granted) {
-//       alert('Permission to access media library is required!');
-//       return;
-//     }
-
-//     const result = await ImagePicker.launchImageLibraryAsync({
-//       mediaTypes: 'images',
-//       allowsEditing: false,
-//       quality: 0.3,
-//     });
-
-//     if (!result.canceled) {
-//       const { uri } = result.assets[0];
-
-//       setSelectedImage(uri);
-//     }
-//   };
-
-//   const uploadImageToStorage = async () => {
-//     if (!selectedImage) return;
-
-//     try {
-//       const response = await fetch(selectedImage);
-//       const file = await response.blob();
-//       const fileName = selectedImage.split('/').pop(); // Отримуємо ім'я файлу з URI
-//       const fileType = file.type; // Отримуємо тип файлу
-//       const imageFile = new File([file], fileName, { type: fileType });
-
-//       const uploadedImageUrl = await uploadImage(user.uid, imageFile, fileName);
-
-//       return uploadedImageUrl;
-//     } catch (e) {
-//       console.log(e);
-//       return null;
-//     }
-//   };
-
-//   const onClearData = () => {
-//     setSelectedImage('');
-//     setUploadedImage('');
-//     setTitle('');
-//     setAddress('');
-//     autocompleteRef?.current?.setAddressText('');
-//   };
-
-//   useEffect(() => {
-//     if (!params?.photo) return;
-
-//     setSelectedImage(params.photo);
-//   }, [params]);
-
-//   const onPublish = async () => {
-//     if (!user) return;
-
-//     try {
-//       const imageUrl = await uploadImageToStorage();
-//       const postId = nanoid();
-
-//       await addPost(postId, {
-//         address,
-//         id: postId,
-//         image: imageUrl,
-//         userId: user.uid,
-//         title,
-//         comments: [],
-//       });
-
-//       Alert.alert('Пост успішно створено!');
-//       onClearData();
-//     } catch (error) {
-//       console.log(error);
-//     }
-//   };
-//   const isDisabled = !title || !address || !selectedImage;
